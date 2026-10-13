@@ -114,28 +114,31 @@
     });
   });
   const links = [...document.querySelectorAll(".nav-link")];
-  const homeLinks = links.filter((link) => link.getAttribute("href") !== "#journal");
+  const pages = new Map([["#journal", $("journal")], ["#games", $("games")]]);
+  const homeLinks = links.filter((link) => !pages.has(link.getAttribute("href")));
   const sections = homeLinks.map((link) => document.querySelector(link.getAttribute("href")));
   function updateNavigation() {
     const current = sections.reduce((active, section, index) => section.getBoundingClientRect().top <= 150 ? index : active, 0);
-    const activeLink = $("journal").hidden ? homeLinks[current] : links.find((link) => link.getAttribute("href") === "#journal");
+    const activePage = [...pages].find(([, page]) => !page.hidden);
+    const activeLink = activePage ? links.find((link) => link.getAttribute("href") === activePage[0]) : homeLinks[current];
     links.forEach((link) => {
       if (link === activeLink) link.setAttribute("aria-current", "location");
       else link.removeAttribute("aria-current");
     });
   }
   function updateView() {
-    const isJournal = location.hash === "#journal";
-    const wasJournal = !$("journal").hidden;
-    $("home-page").hidden = isJournal;
-    $("journal").hidden = !isJournal;
-    if (isJournal && !wasJournal) window.scrollTo({ top: 0, behavior: "instant" });
-    if (!isJournal && wasJournal) {
+    const activePage = pages.get(location.hash) ?? null;
+    const previousPage = [...pages.values()].find((page) => !page.hidden);
+    $("home-page").hidden = Boolean(activePage);
+    pages.forEach((page) => { page.hidden = page !== activePage; });
+    if (activePage && activePage !== previousPage) window.scrollTo({ top: 0, behavior: "instant" });
+    if (!activePage && previousPage) {
       const target = sections.find((section) => `#${section.id}` === location.hash);
       if (target?.id === "home") window.scrollTo({ top: 0, behavior: "instant" });
       else target?.scrollIntoView({ behavior: "instant" });
     }
     updateNavigation();
+    window.dispatchEvent(new CustomEvent("site:viewchange", { detail: { view: activePage?.id ?? "home" } }));
   }
   window.addEventListener("hashchange", updateView);
   let framePending = false;

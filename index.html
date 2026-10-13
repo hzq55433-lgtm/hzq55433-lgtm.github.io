@@ -9,8 +9,11 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%233e5648'/%3E%3Cpath d='M19 42V23h26M19 34h19M30 23v19' fill='none' stroke='%23f6f5ef' stroke-width='4'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="journal.css">
+  <link rel="stylesheet" href="games.css">
   <script src="app.js" defer></script>
   <script src="journal.js" defer></script>
+  <script src="game2048-core.js" defer></script>
+  <script src="games.js" defer></script>
 </head>
 <body>
   <div class="site-shell">
@@ -22,6 +25,7 @@
       <nav aria-label="主导航">
         <a class="nav-link" href="#home" aria-current="page">首页</a>
         <a class="nav-link" href="#journal">日志</a>
+        <a class="nav-link" href="#games">小游戏</a>
         <a class="nav-link" href="#possibilities">可能性</a>
         <a class="nav-link" href="#about">关于这里</a>
       </nav>
@@ -131,6 +135,28 @@
         </div>
         <p class="journal-footnote">日志保存在当前浏览器中。定期导出一份备份，就能把这些日子好好留住。</p>
       </section>
+      <section class="games-page" id="games" aria-labelledby="games-title" hidden>
+        <div class="games-heading"><div><span class="eyebrow"><span class="status-dot"></span> A LITTLE PLAYTIME</span><h1 id="games-title">给大脑，放个小假。</h1><p>不赶时间，玩一局 2048。把相同的数字，慢慢合在一起。</p></div><span class="games-heading-flower" aria-hidden="true">✳</span></div>
+        <div class="games-layout">
+          <div class="game-panel">
+            <div class="game-topline"><div><span class="game-name">2048<span class="game-name-dot">.</span></span><span class="game-subtitle">合在一起，就多一点。</span></div><div class="game-scores"><div><span>当前得分</span><strong id="game-score">0</strong></div><div class="game-best-score"><span>最高分</span><strong id="game-best">0</strong></div></div></div>
+            <div class="game-board-shell">
+              <div id="game-board" class="game-board" role="grid" aria-label="2048 棋盘" aria-describedby="game-controls-help" tabindex="0"></div>
+              <div class="game-overlay" id="game-overlay" hidden><span class="eyebrow" id="game-overlay-label">ONE MORE TRY</span><h2 id="game-overlay-title">这一局，就到这里。</h2><p id="game-overlay-text">换个思路，再试一次。</p><button class="button button-primary" type="button" id="game-continue" hidden>继续挑战 <span aria-hidden="true">↗</span></button><button class="button button-quiet" type="button" id="game-overlay-restart">再开一局</button></div>
+            </div>
+            <div class="game-dpad game-mobile-dpad" aria-label="手机游戏方向控制"><button type="button" class="game-direction" data-move="left" aria-label="向左移动">←</button><button type="button" class="game-direction" data-move="up" aria-label="向上移动">↑</button><button type="button" class="game-direction" data-move="down" aria-label="向下移动">↓</button><button type="button" class="game-direction" data-move="right" aria-label="向右移动">→</button></div>
+            <div class="game-actions"><button class="button button-primary" type="button" id="game-restart">新开一局 <span aria-hidden="true">↻</span></button><button class="button button-quiet" type="button" id="game-undo" disabled>撤回上一步 <span aria-hidden="true">↶</span></button></div>
+            <p id="game-announcement" class="game-announcement" role="status" aria-live="polite">合并相同数字，试着到达 2048。</p>
+            <p id="game-storage-status" class="game-storage-status" role="status" hidden></p>
+          </div>
+          <aside class="game-guide" aria-labelledby="game-guide-title">
+            <span class="eyebrow">SMALL MOVES, LITTLE JOYS</span><h2 id="game-guide-title">一局很简单。</h2><div class="game-rule-example" aria-hidden="true"><span>2</span><i>＋</i><span>2</span><i>＝</i><span class="game-example-result">4</span></div>
+            <ol class="game-rules"><li><span>01</span><div><strong>让数字靠近。</strong><p>向一个方向移动所有方块，相同的数字碰到一起，就会合并。</p></div></li><li><span>02</span><div><strong>每一步，都有新可能。</strong><p>有效移动后会出现一个 2 或 4。尽量留出空位，给下一步一点空间。</p></div></li><li><span>03</span><div><strong>把它们合到 2048。</strong><p>达到 2048 就完成目标，也可以继续挑战更大的数字。</p></div></li></ol>
+            <div class="game-controls"><span class="eyebrow">HOW TO PLAY / 操作</span><p id="game-controls-help">电脑使用方向键或 W / A / S / D。<br>手机在棋盘上滑动，也可以点击下面的方向按钮。</p><div class="game-dpad" aria-label="游戏方向控制"><button type="button" class="game-direction direction-up" data-move="up" aria-label="向上移动">↑</button><button type="button" class="game-direction direction-left" data-move="left" aria-label="向左移动">←</button><button type="button" class="game-direction direction-down" data-move="down" aria-label="向下移动">↓</button><button type="button" class="game-direction direction-right" data-move="right" aria-label="向右移动">→</button></div></div>
+            <p class="game-footnote">离开一下也没关系。<br>当前进度和最高分会保存在这个浏览器中。</p>
+          </aside>
+        </div>
+      </section>
     </main>
     <footer class="site-footer"><span id="footer-name">一隅 · 一个自己的小角落</span><span>内容保存在当前浏览器 <span class="footer-dot">·</span> 慢慢来就好 <span aria-hidden="true">↗</span></span></footer>
   </div>
@@ -163,6 +189,7 @@
   <dialog id="journal-discard-dialog" class="editor-dialog" aria-labelledby="journal-discard-title">
     <div class="dialog-heading"><div><span class="eyebrow">A NOTE BEFORE YOU GO</span><h2 id="journal-discard-title">还有未保存的内容</h2></div></div><p class="journal-confirm-text">继续编辑可以把这篇日志保存下来。放弃后，本次修改不会保留。</p><div class="dialog-actions"><button type="button" class="button button-quiet" id="journal-discard-confirm">放弃修改</button><button type="button" class="button button-primary" data-close="journal-discard-dialog" autofocus>继续编辑</button></div>
   </dialog>
+  <dialog id="game-restart-dialog" class="editor-dialog" aria-labelledby="game-restart-title"><div class="dialog-heading"><div><span class="eyebrow">A FRESH START</span><h2 id="game-restart-title">新开一局？</h2></div><button type="button" class="icon-button" data-close="game-restart-dialog" aria-label="关闭游戏重开确认">×</button></div><p class="journal-confirm-text">当前这一局的进度会重置，最高分会保留。</p><div class="dialog-actions"><button class="button button-quiet" type="button" data-close="game-restart-dialog" autofocus>接着玩</button><button class="button button-primary" type="button" id="game-restart-confirm">开始新的一局</button></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
