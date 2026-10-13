@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f5ef">
+  <meta name="description" content="一个可以慢慢生长的私人小站。记录想法，留住喜欢的事物。">
+  <title>一隅 · 我的小站</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%233e5648'/%3E%3Cpath d='M19 42V23h26M19 34h19M30 23v19' fill='none' stroke='%23f6f5ef' stroke-width='4'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="journal.css">
+  <script src="app.js" defer></script>
+  <script src="journal.js" defer></script>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="#home" aria-label="回到首页">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M8 25V8h19M8 17h16M18 8v17"/></svg></span>
+        <span id="brand-name">一隅<span class="brand-subtitle">我的小站</span></span>
+      </a>
+      <nav aria-label="主导航">
+        <a class="nav-link" href="#home" aria-current="page">首页</a>
+        <a class="nav-link" href="#journal">日志</a>
+        <a class="nav-link" href="#possibilities">可能性</a>
+        <a class="nav-link" href="#about">关于这里</a>
+      </nav>
+      <button class="button button-quiet customize-button" id="customize" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5 5 5M4 20l5-1L20 8a2.1 2.1 0 0 0-3-3L6 16l-2 4Z"/></svg><span>装扮首页</span></button>
+    </header>
+
+    <main>
+      <div id="home-page">
+      <section class="hero" id="home" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="status-dot"></span> MY LITTLE CORNER <span class="eyebrow-line"></span></div>
+          <h1 id="hero-title">给想法，<br>留一个<span class="title-accent">地方。</span></h1>
+          <p class="hero-description" id="site-description">还没想好这里要变成什么，也没关系。<br>先有一个自己的小角落，再慢慢放进喜欢的东西。</p>
+          <div class="hero-actions">
+            <button class="button button-primary" id="write-note" type="button">写下第一个想法 <span aria-hidden="true">↗</span></button>
+            <a class="button button-text" href="#possibilities">看看有哪些可能 <span aria-hidden="true">↓</span></a>
+          </div>
+          <div class="hero-footnote"><span class="tiny-spark" aria-hidden="true">✳</span> 从一张空白页开始，按自己的节奏来。</div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="art-grid"></div>
+          <div class="art-circle"></div>
+          <div class="paper paper-back"><span>A SPACE TO GROW</span><div class="paper-lines"></div></div>
+          <div class="paper paper-front">
+            <div class="paper-label">NOTE TO SELF <span>01</span></div>
+            <svg class="plant" viewBox="0 0 300 255" fill="none">
+              <path d="M149 205c5-49-8-104 18-165M151 157c-27-8-53-23-70-54M155 114c27-4 51-16 66-35" stroke="#475f4c" stroke-width="2.4" stroke-linecap="round"/>
+              <path d="M165 69c-16-24-4-43 22-51 2 26-2 43-22 51Z" fill="#879a75"/>
+              <path d="M156 112c-27-12-34-34-27-59 23 14 34 32 27 59Z" fill="#647b5e"/>
+              <path d="M153 152c-26-2-35-13-43-36 28-2 43 9 43 36Z" fill="#a3ad8e"/>
+              <path d="M186 107c2-28 19-39 47-37-8 23-21 37-47 37Z" fill="#9eab86"/>
+              <path d="M106 133c-28-1-44-19-48-44 28 4 44 19 48 44Z" fill="#83966e"/>
+              <path d="M154 184c14-26 35-30 58-17-19 20-35 27-58 17Z" fill="#6a825f"/>
+              <path d="m119 198 9 42h45l10-42" fill="#c5b99f"/>
+              <path d="M116 197h70v8h-70z" fill="#d5cbb7"/>
+              <path d="M114 241h74" stroke="#b7b3a5" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <div class="paper-caption">不必一次长成。<span>one little thing at a time.</span></div>
+          </div>
+          <div class="art-tape"></div>
+          <span class="art-plus plus-one">+</span><span class="art-plus plus-two">+</span>
+          <div class="art-tag"><span class="status-dot"></span> 慢慢生长中</div>
+        </div>
+      </section>
+
+      <section class="desk" aria-label="我的小桌面">
+        <div class="note-card">
+          <div class="section-topline"><span class="eyebrow">01 / 此刻的想法</span><button class="text-action" id="edit-note" type="button">写一笔 <span aria-hidden="true">↗</span></button></div>
+          <p class="note-content is-empty" id="note-content">如果脑海里刚好闪过一个念头，<br>就先把它留在这里。</p>
+          <div class="note-bottom"><span id="note-meta">等你的第一笔</span><svg viewBox="0 0 50 28" aria-hidden="true"><path d="M4 21c8-16 8-19 9-4s3-1 9-6 2 18 10 6 10-9 14-6"/></svg></div>
+        </div>
+        <div class="today-card">
+          <span class="eyebrow">一个普通的好日子</span>
+          <div class="today-date"><span id="date-day">13</span><div><span id="date-month">OCTOBER</span><span id="date-year">2026 · 星期二</span></div></div>
+          <div class="today-rule"></div>
+          <p>今天做一点，<br>就比昨天多一点。</p>
+          <span class="today-flower" aria-hidden="true">✳</span>
+        </div>
+      </section>
+
+      <section class="journal-preview" aria-labelledby="journal-preview-title">
+        <div><span class="eyebrow">MY JOURNAL / 日常日志</span><h2 id="journal-preview-title">今天，有什么想留下？</h2><p id="journal-preview-text">一件小事、一段心情，或者今天做了什么。写下来，以后还能回来看看。</p><span id="journal-preview-date"></span></div>
+        <a class="button button-quiet" href="#journal" id="journal-preview-link">打开日志本 <span aria-hidden="true">↗</span></a>
+      </section>
+      <section class="possibilities" id="possibilities" aria-labelledby="possibilities-title">
+        <div class="section-heading"><div><span class="eyebrow">ROOM FOR WHAT'S NEXT</span><h2 id="possibilities-title">这里以后，可以放什么？</h2></div><p>不用现在决定。点开看看，哪个方向让你有点心动。</p></div>
+        <div class="direction-grid">
+          <details class="direction-card">
+            <summary><span class="direction-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 5h14a3 3 0 0 1 3 3v19H11a4 4 0 0 1-4-4V6m0 17h18M12 11h8M12 16h6"/></svg></span><span class="direction-number">01</span><h3>想法与笔记</h3><p>那些转瞬即逝、值得留下的念头。</p><span class="direction-link">想想这个方向 <span class="direction-arrow" aria-hidden="true">↗</span></span></summary>
+            <div class="direction-detail">读书时的一句话、一个还没成形的点子，或今天的小发现。以后可以把它们整理成笔记，让这个小站成为自己的记忆库。</div>
+          </details>
+          <details class="direction-card">
+            <summary><span class="direction-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 10h22v16H5zM11 10V6h10v4M5 17h22M13 17v4h6v-4"/></svg></span><span class="direction-number">02</span><h3>作品与记录</h3><p>把做过的事情，放在看得见的地方。</p><span class="direction-link">想想这个方向 <span class="direction-arrow" aria-hidden="true">↗</span></span></summary>
+            <div class="direction-detail">一个小项目、一组照片、一篇文章，或者某次尝试的过程。以后可以做成作品列表，慢慢记录自己在做什么。</div>
+          </details>
+          <details class="direction-card">
+            <summary><span class="direction-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 5h14v23l-7-5-7 5V5Z"/><path d="M13 11h6M13 15h6"/></svg></span><span class="direction-number">03</span><h3>喜欢的事物</h3><p>给常用的、喜欢的，找一个落脚点。</p><span class="direction-link">想想这个方向 <span class="direction-arrow" aria-hidden="true">↗</span></span></summary>
+            <div class="direction-detail">常用网站、好文章、喜欢的音乐，或想去的地方。以后可以做成一个收藏架，需要的时候，回来就能找到。</div>
+          </details>
+        </div>
+      </section>
+
+      <section class="about-section" id="about" aria-labelledby="about-title">
+        <span class="about-symbol" aria-hidden="true">✳</span>
+        <div><span class="eyebrow">ABOUT THIS SPACE</span><h2 id="about-title">还在起步，也很好。</h2><p id="about-text">这是我的私人小站。记录想法，也写下日常。之后的内容，留给以后的想法。<br>它可以很小，但每一处都可以是自己喜欢的样子。</p></div>
+        <span class="about-side-note">Made for a slower pace.</span>
+      </section>
+      </div>
+      <section class="journal-page" id="journal" aria-labelledby="journal-title" hidden>
+        <div class="journal-heading"><div><span class="eyebrow"><span class="status-dot"></span> THE DAYS WE KEEP</span><h1 id="journal-title">把日子，一页页留下。</h1><p>不需要发生特别的事，普通的一天也值得记录。</p></div><button type="button" class="button button-primary" id="journal-new">＋ 写一篇日志</button></div>
+        <div class="journal-toolbar">
+          <label class="journal-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg><input type="search" id="journal-search" placeholder="搜索标题或正文" aria-label="搜索日志" maxlength="100"></label>
+          <label class="journal-month-label" for="journal-month">月份 <input type="month" id="journal-month" aria-label="按月份筛选日志"></label>
+          <button class="text-action" id="journal-reset" type="button" hidden>清除筛选</button>
+          <div class="journal-backup-actions"><button class="text-action" id="journal-import" type="button">导入备份</button><button class="text-action" id="journal-export" type="button">导出备份 <span aria-hidden="true">↓</span></button><input type="file" id="journal-file" accept=".json,application/json" hidden></div>
+        </div>
+        <div class="journal-status"><span id="journal-count" role="status" aria-live="polite">共 0 篇日志</span><button type="button" id="journal-trash" class="text-action">回收站 (0)</button></div>
+        <div id="journal-storage-warning" class="journal-warning" role="status" hidden>浏览器无法读取原有日志。请先导出备份或检查浏览器存储，暂时不会覆盖原有数据。</div>
+        <div class="journal-layout">
+          <aside class="journal-list-panel" aria-label="日志列表"><div class="journal-list-label"><span class="eyebrow" id="journal-list-label">留在这里的日子</span><span aria-hidden="true">✳</span></div><div id="journal-list"></div><p class="journal-list-empty" id="journal-list-empty">日志本还是空的，<br>从今天开始写一篇吧。</p></aside>
+          <article class="journal-reader" id="journal-reader" aria-label="日志正文" hidden>
+            <div class="journal-reader-top"><time id="journal-reader-date"></time><span id="journal-reader-length"></span></div>
+            <h2 id="journal-reader-title"></h2><div class="journal-reader-content" id="journal-reader-content"></div>
+            <div class="journal-reader-bottom"><span id="journal-reader-updated"></span><div><button type="button" class="button button-quiet" id="journal-edit">编辑日志</button><button type="button" class="text-action journal-delete" id="journal-delete">移到回收站</button><button type="button" class="button button-quiet" id="journal-restore" hidden>恢复日志</button></div></div>
+          </article>
+          <div class="journal-empty" id="journal-empty"><span class="journal-empty-flower" aria-hidden="true">✳</span><span class="eyebrow">A PAGE FOR TODAY</span><h2 id="journal-empty-title">第一篇，留给今天。</h2><p id="journal-empty-text">想到什么，就写什么。<br>这本日志，只需要按你的节奏来。</p><button type="button" class="button button-primary" id="journal-first">写下第一篇 <span aria-hidden="true">↗</span></button></div>
+        </div>
+        <p class="journal-footnote">日志保存在当前浏览器中。定期导出一份备份，就能把这些日子好好留住。</p>
+      </section>
+    </main>
+    <footer class="site-footer"><span id="footer-name">一隅 · 一个自己的小角落</span><span>内容保存在当前浏览器 <span class="footer-dot">·</span> 慢慢来就好 <span aria-hidden="true">↗</span></span></footer>
+  </div>
+
+  <dialog id="note-dialog" class="editor-dialog" aria-labelledby="note-dialog-title">
+    <form id="note-form"><div class="dialog-heading"><div><span class="eyebrow">A LITTLE NOTE</span><h2 id="note-dialog-title">留下一点想法</h2></div><button class="icon-button" type="button" data-close="note-dialog" aria-label="关闭">×</button></div>
+      <label for="note-input">想到什么，就写什么。</label><textarea id="note-input" maxlength="2000" rows="6" placeholder="比如：以后想在这里放一个自己的读书清单……"></textarea><p class="field-hint">这张便签只保存在当前设备的这个浏览器里。</p>
+      <div class="dialog-actions"><button class="button button-quiet" type="button" data-close="note-dialog">先不写了</button><button class="button button-primary" type="submit">保存想法 <span aria-hidden="true">↗</span></button></div>
+    </form>
+  </dialog>
+  <dialog id="settings-dialog" class="editor-dialog" aria-labelledby="settings-dialog-title">
+    <form id="settings-form"><div class="dialog-heading"><div><span class="eyebrow">MAKE IT YOURS</span><h2 id="settings-dialog-title">让这里更像你</h2></div><button class="icon-button" type="button" data-close="settings-dialog" aria-label="关闭">×</button></div>
+      <label for="name-input">小站的名字</label><input id="name-input" maxlength="12" required placeholder="一隅">
+      <label for="intro-input">首页的一句话</label><textarea id="intro-input" maxlength="180" rows="3" required></textarea><p class="field-hint">这些设置保存在当前浏览器，之后可以随时再改。</p>
+      <div class="dialog-actions"><button class="button button-quiet" type="button" data-close="settings-dialog">取消</button><button class="button button-primary" type="submit">保存修改 <span aria-hidden="true">↗</span></button></div>
+    </form>
+  </dialog>
+  <dialog id="journal-dialog" class="editor-dialog journal-editor" aria-labelledby="journal-dialog-title">
+    <form id="journal-form"><div class="dialog-heading"><div><span class="eyebrow">ONE DAY, ONE PAGE</span><h2 id="journal-dialog-title">写一篇日志</h2></div><button class="icon-button" type="button" id="journal-close" aria-label="关闭日志编辑">×</button></div>
+      <div class="journal-editor-fields"><div><label for="journal-date-input">记录日期</label><input type="date" id="journal-date-input" required></div><div><label for="journal-title-input">标题 <span class="optional-label">可选</span></label><input type="text" id="journal-title-input" maxlength="80" placeholder="给今天起一个名字"></div></div>
+      <label for="journal-content-input">正文</label><textarea id="journal-content-input" maxlength="30000" rows="12" required placeholder="今天做了什么？有什么想法，或者想记住的小事？"></textarea>
+      <div class="journal-editor-hint"><span class="field-hint">纯文字日志 · 保存后会留在当前浏览器</span><span id="journal-word-count">0 字</span></div>
+      <p class="journal-form-error" id="journal-form-error" role="alert" hidden></p>
+      <div class="dialog-actions"><button class="button button-quiet" type="button" id="journal-cancel">取消</button><button class="button button-primary" type="submit">保存日志 <span aria-hidden="true">↗</span></button></div>
+    </form>
+  </dialog>
+  <dialog id="journal-delete-dialog" class="editor-dialog" aria-labelledby="journal-delete-title">
+    <div class="dialog-heading"><div><span class="eyebrow">KEEP OR LET GO</span><h2 id="journal-delete-title">移到回收站？</h2></div><button type="button" class="icon-button" data-close="journal-delete-dialog" aria-label="关闭删除确认">×</button></div><p class="journal-confirm-text" id="journal-delete-description"></p><p class="field-hint">之后可以在日志页的回收站里恢复。</p><div class="dialog-actions"><button type="button" class="button button-quiet" data-close="journal-delete-dialog">保留日志</button><button type="button" class="button button-primary" id="journal-delete-confirm">移到回收站</button></div>
+  </dialog>
+  <dialog id="journal-discard-dialog" class="editor-dialog" aria-labelledby="journal-discard-title">
+    <div class="dialog-heading"><div><span class="eyebrow">A NOTE BEFORE YOU GO</span><h2 id="journal-discard-title">还有未保存的内容</h2></div></div><p class="journal-confirm-text">继续编辑可以把这篇日志保存下来。放弃后，本次修改不会保留。</p><div class="dialog-actions"><button type="button" class="button button-quiet" id="journal-discard-confirm">放弃修改</button><button type="button" class="button button-primary" data-close="journal-discard-dialog" autofocus>继续编辑</button></div>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
