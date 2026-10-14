@@ -1,0 +1,29 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      PUBLIC_ORIGIN: https://${SITE_DOMAIN:?请先在 .env 中填写 SITE_DOMAIN}
+      REGISTRATION_MODE: ${REGISTRATION_MODE:-open}
+      INVITE_CODE: ${INVITE_CODE:-}
+      TRUST_PROXY: "true"
+    volumes:
+      - site-data:/app/data
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?请先在 .env 中填写 SITE_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - app
+volumes:
+  site-data:
+  caddy-data:
+  caddy-config:

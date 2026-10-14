@@ -10,13 +10,28 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="journal.css">
   <link rel="stylesheet" href="games.css">
+  <link rel="stylesheet" href="account.css">
+  <link rel="stylesheet" href="vendor/pdfjs/pdf_viewer.css">
+  <link rel="stylesheet" href="library.css">
+  <script src="account.js" defer></script>
   <script src="app.js" defer></script>
   <script src="journal.js" defer></script>
   <script src="game2048-core.js" defer></script>
   <script src="games.js" defer></script>
+  <script src="library.js" defer></script>
 </head>
 <body>
-  <div class="site-shell">
+  <div class="account-loading" id="account-loading" role="status">正在打开你的小角落…</div>
+  <noscript><p class="account-noscript">请启用浏览器的 JavaScript，才能使用账号与小站功能。</p></noscript>
+  <section class="account-screen" id="account-screen" aria-labelledby="account-title" hidden>
+    <a class="account-brand" href="/" aria-label="一隅首页"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M8 25V8h19M8 17h16M18 8v17"/></svg></span><span>一隅 <small>每个人，都有自己的小角落。</small></span></a>
+    <div class="account-layout"><div class="account-form-panel"><span class="eyebrow"><span class="status-dot"></span> A SPACE OF YOUR OWN</span><h1 id="account-title">欢迎回来。</h1><p class="account-intro" id="account-intro">登录，接着记录你自己的日子。</p>
+      <div class="account-tabs" role="tablist" aria-label="账号操作"><button type="button" role="tab" aria-selected="true" aria-controls="account-form" id="account-login-tab">登录</button><button type="button" role="tab" aria-selected="false" aria-controls="account-form" id="account-register-tab">注册账号</button></div>
+      <form id="account-form"><div id="account-nickname-field" hidden><label for="account-nickname">怎么称呼你</label><input id="account-nickname" type="text" maxlength="24" autocomplete="nickname" placeholder="给自己起个昵称"></div><label for="account-email">邮箱</label><input id="account-email" type="email" maxlength="254" autocomplete="username" required placeholder="you@example.com"><label for="account-password">密码</label><div class="account-password-field"><input id="account-password" type="password" maxlength="128" autocomplete="current-password" required><button type="button" id="account-password-toggle" aria-label="显示密码">显示</button></div><p class="field-hint" id="account-password-hint" hidden>注册密码至少 15 个字符，可以使用一句容易记住的短句。</p><div id="account-invite-field" hidden><label for="account-invite">邀请码</label><input id="account-invite" type="text" maxlength="128" autocomplete="off" placeholder="填写朋友提供的邀请码"></div><p class="account-error" id="account-error" role="alert" hidden></p><button class="button button-primary account-submit" id="account-submit" type="submit">进入我的小站 <span aria-hidden="true">↗</span></button></form>
+      <button class="button button-quiet" id="account-retry" type="button" hidden>重新连接</button><p class="account-privacy">日志和个人内容仅你的账号可见。<br>邮箱用作登录名，不会展示给其他用户。</p>
+    </div><div class="account-art" aria-hidden="true"><div class="account-art-circle"></div><div class="account-art-paper"><span class="eyebrow">ONLY YOUR LITTLE CORNER</span><svg viewBox="0 0 240 220" fill="none"><path d="M120 172c-3-48 5-75 25-119M119 127c-21-8-37-22-43-39" stroke="#627b56" stroke-width="2"/><path d="M137 76c-15-27 0-46 22-49 1 21-5 40-22 49Z" fill="#8ca277"/><path d="M124 109c-23-5-37-25-34-47 24 9 34 23 34 47Z" fill="#627d57"/><path d="M123 138c15-26 33-33 55-24-14 27-33 35-55 24Z" fill="#9cae86"/><path d="M86 110c-21-3-34-18-34-40 23 9 33 19 34 40Z" fill="#aeb99b"/><path d="m96 165 7 38h34l8-38" fill="#c3b99e"/><path d="M93 164h54v7H93z" fill="#d5cbb3"/></svg><p>把日子留下，<br>也把自己留在这里。</p><span class="account-art-caption">One account. Your own space.</span></div><span class="account-art-flower">✳</span></div></div>
+  </section>
+  <div class="site-shell" id="site-shell" hidden>
     <header class="site-header">
       <a class="brand" href="#home" aria-label="回到首页">
         <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M8 25V8h19M8 17h16M18 8v17"/></svg></span>
@@ -25,11 +40,12 @@
       <nav aria-label="主导航">
         <a class="nav-link" href="#home" aria-current="page">首页</a>
         <a class="nav-link" href="#journal">日志</a>
+        <a class="nav-link" href="#library">文献库</a>
         <a class="nav-link" href="#games">小游戏</a>
         <a class="nav-link" href="#possibilities">可能性</a>
         <a class="nav-link" href="#about">关于这里</a>
       </nav>
-      <button class="button button-quiet customize-button" id="customize" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5 5 5M4 20l5-1L20 8a2.1 2.1 0 0 0-3-3L6 16l-2 4Z"/></svg><span>装扮首页</span></button>
+      <div class="header-actions"><button class="button button-quiet customize-button" id="customize" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5 5 5M4 20l5-1L20 8a2.1 2.1 0 0 0-3-3L6 16l-2 4Z"/></svg><span>装扮首页</span></button><button class="button button-quiet account-button" id="account-button" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M5 20c0-5 3-7 7-7s7 2 7 7"/></svg><span id="account-label">账号登录</span></button></div>
     </header>
 
     <main>
@@ -133,7 +149,7 @@
           </article>
           <div class="journal-empty" id="journal-empty"><span class="journal-empty-flower" aria-hidden="true">✳</span><span class="eyebrow">A PAGE FOR TODAY</span><h2 id="journal-empty-title">第一篇，留给今天。</h2><p id="journal-empty-text">想到什么，就写什么。<br>这本日志，只需要按你的节奏来。</p><button type="button" class="button button-primary" id="journal-first">写下第一篇 <span aria-hidden="true">↗</span></button></div>
         </div>
-        <p class="journal-footnote">日志保存在当前浏览器中。定期导出一份备份，就能把这些日子好好留住。</p>
+        <p class="journal-footnote" id="journal-storage-hint">日志保存在当前浏览器中。定期导出一份备份，就能把这些日子好好留住。</p>
       </section>
       <section class="games-page" id="games" aria-labelledby="games-title" hidden>
         <div class="games-heading"><div><span class="eyebrow"><span class="status-dot"></span> A LITTLE PLAYTIME</span><h1 id="games-title">给大脑，放个小假。</h1><p>不赶时间，玩一局 2048。把相同的数字，慢慢合在一起。</p></div><span class="games-heading-flower" aria-hidden="true">✳</span></div>
@@ -153,24 +169,44 @@
             <span class="eyebrow">SMALL MOVES, LITTLE JOYS</span><h2 id="game-guide-title">一局很简单。</h2><div class="game-rule-example" aria-hidden="true"><span>2</span><i>＋</i><span>2</span><i>＝</i><span class="game-example-result">4</span></div>
             <ol class="game-rules"><li><span>01</span><div><strong>让数字靠近。</strong><p>向一个方向移动所有方块，相同的数字碰到一起，就会合并。</p></div></li><li><span>02</span><div><strong>每一步，都有新可能。</strong><p>有效移动后会出现一个 2 或 4。尽量留出空位，给下一步一点空间。</p></div></li><li><span>03</span><div><strong>把它们合到 2048。</strong><p>达到 2048 就完成目标，也可以继续挑战更大的数字。</p></div></li></ol>
             <div class="game-controls"><span class="eyebrow">HOW TO PLAY / 操作</span><p id="game-controls-help">电脑使用方向键或 W / A / S / D。<br>手机在棋盘上滑动，也可以点击下面的方向按钮。</p><div class="game-dpad" aria-label="游戏方向控制"><button type="button" class="game-direction direction-up" data-move="up" aria-label="向上移动">↑</button><button type="button" class="game-direction direction-left" data-move="left" aria-label="向左移动">←</button><button type="button" class="game-direction direction-down" data-move="down" aria-label="向下移动">↓</button><button type="button" class="game-direction direction-right" data-move="right" aria-label="向右移动">→</button></div></div>
-            <p class="game-footnote">离开一下也没关系。<br>当前进度和最高分会保存在这个浏览器中。</p>
+            <p class="game-footnote" id="game-footnote">离开一下也没关系。<br>当前进度和最高分会保存在这个浏览器中。</p>
           </aside>
         </div>
       </section>
+      <section class="library-page" id="library" aria-labelledby="library-title" hidden>
+        <div class="library-heading"><div><span class="eyebrow"><span class="status-dot"></span> MY READING ROOM / 本地文献库</span><h1 id="library-title">读过的，留在这里。</h1><p>收好一份文献，留下一点思考。下次回来，从上次读到的地方继续。</p></div><button class="button button-primary" id="library-import" type="button"><span aria-hidden="true">＋</span> 导入 PDF</button><input id="library-files" type="file" accept=".pdf,application/pdf" multiple hidden></div>
+        <div class="library-strip"><span><span class="status-dot"></span> 只保存在这台电脑</span><span id="library-stats">0 篇文献 · 0 篇收藏</span><span class="library-strip-end">一份原文，一段自己的理解。</span></div>
+        <p class="library-status" id="library-status" role="status" aria-live="polite" hidden></p>
+        <div class="library-startup" id="library-startup" hidden><h2>先打开本地小站</h2><p>双击文件夹里的「启动小站.cmd」，再访问 http://127.0.0.1:4317，即可将 PDF 存入本地电脑并阅读。</p></div>
+        <div class="library-layout" id="library-layout">
+          <aside class="library-shelf" aria-label="文献列表"><div class="library-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg><input id="library-search" type="search" aria-label="搜索文献" placeholder="搜索标题、作者或标签"></div><div class="library-filters"><label for="library-filter">我的书架</label><select id="library-filter"><option value="all">全部文献</option><option value="starred">收藏的文献</option><option value="trash">回收站</option></select></div><div class="library-list" id="library-list"></div><div class="library-shelf-hint"><span aria-hidden="true">↳</span> PDF 可以拖到这一页导入。<br>每份不超过 80 MB，重复文件自动识别。</div></aside>
+          <div class="library-reading-area">
+            <div class="library-empty" id="library-empty"><div class="library-book-art" aria-hidden="true"><span class="book-page book-left"></span><span class="book-page book-right"></span><span class="book-spark">✳</span></div><span class="eyebrow">MAKE ROOM FOR A GOOD PAPER</span><h2>把第一份文献，放上书架。</h2><p>点击「导入 PDF」或将文件拖到这里。<br>原文、阅读位置和笔记，都留在自己的电脑上。</p><button type="button" class="button button-quiet" id="library-import-empty">选择一份 PDF <span aria-hidden="true">↗</span></button></div>
+            <article id="library-reader" class="library-reader" aria-labelledby="paper-title" hidden>
+              <div class="paper-heading"><div><span class="eyebrow">ON MY DESK / 正在阅读</span><h2 id="paper-title"></h2><p id="paper-info"></p></div><button type="button" class="paper-star icon-button" id="paper-star" aria-label="收藏文献" aria-pressed="false">☆</button></div>
+              <div class="pdf-toolbar" role="group" aria-label="PDF 阅读操作"><div class="pdf-pages"><button type="button" class="pdf-tool" id="pdf-prev" aria-label="上一页">‹</button><label class="sr-only" for="pdf-page">PDF 页码</label><input id="pdf-page" type="number" min="1" value="1"><span id="pdf-total">/ —</span><button type="button" class="pdf-tool" id="pdf-next" aria-label="下一页">›</button></div><label class="sr-only" for="pdf-zoom">缩放比例</label><select id="pdf-zoom"><option value="fit">适合宽度</option><option value="0.75">75%</option><option value="1">100%</option><option value="1.25">125%</option><option value="1.5">150%</option><option value="2">200%</option><option value="3">300%</option></select><button type="button" class="pdf-tool" id="pdf-rotate" aria-label="旋转页面">↻</button><button type="button" class="pdf-tool" id="pdf-fullscreen" aria-label="展开阅读器">⛶</button><a id="pdf-download" class="pdf-tool" download aria-label="下载原 PDF">↓</a></div>
+              <div class="pdf-viewport" id="pdf-viewport"><p id="pdf-status" class="pdf-status" role="status">正在打开 PDF…</p><div class="pdf-page-wrap" id="pdf-page-wrap" hidden><canvas id="pdf-canvas" aria-label="PDF 页面"></canvas><div class="textLayer" id="pdf-text-layer"></div></div></div>
+              <div class="pdf-reading-foot"><span id="pdf-progress">阅读位置自动保存在本地</span><span>可选中文字复制 · ← / → 翻页</span></div>
+              <div class="paper-details"><details id="paper-metadata"><summary>文献信息与我的笔记 <span aria-hidden="true">＋</span></summary><form id="paper-form"><label for="paper-title-input">文献标题</label><input id="paper-title-input" maxlength="300" required><div class="paper-meta-grid"><div><label for="paper-authors">作者 <span class="optional-label">可选</span></label><input id="paper-authors" maxlength="500" placeholder="自己填写作者信息"></div><div><label for="paper-year">年份</label><input id="paper-year" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="如 2026"></div></div><label for="paper-tags">标签</label><input id="paper-tags" maxlength="620" placeholder="如：待读，材料，综述（逗号分隔）"><label for="paper-notes">我的阅读笔记</label><textarea id="paper-notes" rows="7" maxlength="100000" placeholder="记下问题、关键结论，以及自己的理解……"></textarea><div class="paper-save-row"><span class="field-hint" id="paper-note-hint">笔记保存在这台电脑，不会修改原 PDF。</span><button type="submit" class="button button-primary" id="paper-save">保存信息与笔记</button></div></form></details><div class="paper-bottom-actions"><span id="paper-file-info"></span><button type="button" class="text-action" id="paper-trash">移到回收站</button></div></div>
+            </article>
+          </div>
+        </div>
+        <p class="library-footnote">PDF 原文件和阅读记录保存在小站的 data 文件夹。关闭小站后备份整个文件夹，就能把文献和笔记一起留住。</p>
+      </section>
     </main>
-    <footer class="site-footer"><span id="footer-name">一隅 · 一个自己的小角落</span><span>内容保存在当前浏览器 <span class="footer-dot">·</span> 慢慢来就好 <span aria-hidden="true">↗</span></span></footer>
+    <footer class="site-footer"><span id="footer-name">一隅 · 一个自己的小角落</span><span><span id="storage-footer">内容保存在当前浏览器</span> <span class="footer-dot">·</span> 慢慢来就好 <span aria-hidden="true">↗</span></span></footer>
   </div>
 
   <dialog id="note-dialog" class="editor-dialog" aria-labelledby="note-dialog-title">
     <form id="note-form"><div class="dialog-heading"><div><span class="eyebrow">A LITTLE NOTE</span><h2 id="note-dialog-title">留下一点想法</h2></div><button class="icon-button" type="button" data-close="note-dialog" aria-label="关闭">×</button></div>
-      <label for="note-input">想到什么，就写什么。</label><textarea id="note-input" maxlength="2000" rows="6" placeholder="比如：以后想在这里放一个自己的读书清单……"></textarea><p class="field-hint">这张便签只保存在当前设备的这个浏览器里。</p>
+      <label for="note-input">想到什么，就写什么。</label><textarea id="note-input" maxlength="2000" rows="6" placeholder="比如：以后想在这里放一个自己的读书清单……"></textarea><p class="field-hint" id="note-storage-hint">这张便签只保存在当前设备的这个浏览器里。</p>
       <div class="dialog-actions"><button class="button button-quiet" type="button" data-close="note-dialog">先不写了</button><button class="button button-primary" type="submit">保存想法 <span aria-hidden="true">↗</span></button></div>
     </form>
   </dialog>
   <dialog id="settings-dialog" class="editor-dialog" aria-labelledby="settings-dialog-title">
     <form id="settings-form"><div class="dialog-heading"><div><span class="eyebrow">MAKE IT YOURS</span><h2 id="settings-dialog-title">让这里更像你</h2></div><button class="icon-button" type="button" data-close="settings-dialog" aria-label="关闭">×</button></div>
       <label for="name-input">小站的名字</label><input id="name-input" maxlength="12" required placeholder="一隅">
-      <label for="intro-input">首页的一句话</label><textarea id="intro-input" maxlength="180" rows="3" required></textarea><p class="field-hint">这些设置保存在当前浏览器，之后可以随时再改。</p>
+      <label for="intro-input">首页的一句话</label><textarea id="intro-input" maxlength="180" rows="3" required></textarea><p class="field-hint" id="profile-storage-hint">这些设置保存在当前浏览器，之后可以随时再改。</p>
       <div class="dialog-actions"><button class="button button-quiet" type="button" data-close="settings-dialog">取消</button><button class="button button-primary" type="submit">保存修改 <span aria-hidden="true">↗</span></button></div>
     </form>
   </dialog>
@@ -178,7 +214,7 @@
     <form id="journal-form"><div class="dialog-heading"><div><span class="eyebrow">ONE DAY, ONE PAGE</span><h2 id="journal-dialog-title">写一篇日志</h2></div><button class="icon-button" type="button" id="journal-close" aria-label="关闭日志编辑">×</button></div>
       <div class="journal-editor-fields"><div><label for="journal-date-input">记录日期</label><input type="date" id="journal-date-input" required></div><div><label for="journal-title-input">标题 <span class="optional-label">可选</span></label><input type="text" id="journal-title-input" maxlength="80" placeholder="给今天起一个名字"></div></div>
       <label for="journal-content-input">正文</label><textarea id="journal-content-input" maxlength="30000" rows="12" required placeholder="今天做了什么？有什么想法，或者想记住的小事？"></textarea>
-      <div class="journal-editor-hint"><span class="field-hint">纯文字日志 · 保存后会留在当前浏览器</span><span id="journal-word-count">0 字</span></div>
+      <div class="journal-editor-hint"><span class="field-hint" id="journal-editor-storage">纯文字日志 · 保存后会留在当前浏览器</span><span id="journal-word-count">0 字</span></div>
       <p class="journal-form-error" id="journal-form-error" role="alert" hidden></p>
       <div class="dialog-actions"><button class="button button-quiet" type="button" id="journal-cancel">取消</button><button class="button button-primary" type="submit">保存日志 <span aria-hidden="true">↗</span></button></div>
     </form>
@@ -190,6 +226,9 @@
     <div class="dialog-heading"><div><span class="eyebrow">A NOTE BEFORE YOU GO</span><h2 id="journal-discard-title">还有未保存的内容</h2></div></div><p class="journal-confirm-text">继续编辑可以把这篇日志保存下来。放弃后，本次修改不会保留。</p><div class="dialog-actions"><button type="button" class="button button-quiet" id="journal-discard-confirm">放弃修改</button><button type="button" class="button button-primary" data-close="journal-discard-dialog" autofocus>继续编辑</button></div>
   </dialog>
   <dialog id="game-restart-dialog" class="editor-dialog" aria-labelledby="game-restart-title"><div class="dialog-heading"><div><span class="eyebrow">A FRESH START</span><h2 id="game-restart-title">新开一局？</h2></div><button type="button" class="icon-button" data-close="game-restart-dialog" aria-label="关闭游戏重开确认">×</button></div><p class="journal-confirm-text">当前这一局的进度会重置，最高分会保留。</p><div class="dialog-actions"><button class="button button-quiet" type="button" data-close="game-restart-dialog" autofocus>接着玩</button><button class="button button-primary" type="button" id="game-restart-confirm">开始新的一局</button></div></dialog>
+  <dialog id="account-details" class="editor-dialog" aria-labelledby="account-details-title"><div class="dialog-heading"><div><span class="eyebrow">YOUR OWN SPACE</span><h2 id="account-details-title">我的账号</h2></div><button type="button" class="icon-button" id="account-details-close" aria-label="关闭账号信息">×</button></div><p class="account-detail-name" id="account-detail-name"></p><p class="account-detail-email" id="account-detail-email"></p><p class="account-detail-copy" id="account-detail-copy"></p><p class="account-error" id="account-details-error" role="alert" hidden></p><div class="dialog-actions"><button class="button button-quiet" type="button" id="account-details-done">知道了</button><button class="button button-primary" type="button" id="account-logout">退出登录</button></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="paper-discard-dialog" class="editor-dialog" aria-labelledby="paper-discard-title"><div class="dialog-heading"><h2 id="paper-discard-title">还有未保存的文献笔记</h2></div><p>可以先保存信息与笔记，再打开另一份文献。</p><div class="dialog-actions"><button type="button" class="button button-quiet" id="paper-discard">放弃本次修改</button><button type="button" class="button button-primary" id="paper-keep">继续编辑</button></div></dialog>
+  <dialog id="pdf-password-dialog" class="editor-dialog" aria-labelledby="pdf-password-title"><form id="pdf-password-form"><div class="dialog-heading"><h2 id="pdf-password-title">这份 PDF 需要密码</h2></div><p id="pdf-password-hint">密码仅用于本次阅读，不会保存到文献库。</p><label for="pdf-password">PDF 密码</label><input type="password" id="pdf-password" autocomplete="off" required><div class="dialog-actions"><button type="button" class="button button-quiet" id="pdf-password-cancel">取消阅读</button><button type="submit" class="button button-primary">打开 PDF</button></div></form></dialog>
 </body>
 </html>

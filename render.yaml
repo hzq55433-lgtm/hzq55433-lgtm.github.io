@@ -1,0 +1,32 @@
+# Native Node hosting; Render supplies HTTPS and RENDER_EXTERNAL_URL.
+# Compute + 1 GB disk: currently USD 7.25/month, before usage overages/tax.
+services:
+  - type: web
+    name: little-corner
+    runtime: node
+    plan: 0.5c-512mb
+    region: singapore
+    numInstances: 1
+    buildCommand: node --test
+    startCommand: node server.mjs
+    healthCheckPath: /api/health
+    autoDeployTrigger: off
+    disk:
+      name: little-corner-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 24.19.0
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: "10000"
+      - key: DATA_FILE
+        value: /var/data/site.sqlite
+      - key: TRUST_PROXY
+        value: "true"
+      - key: REGISTRATION_MODE
+        value: open

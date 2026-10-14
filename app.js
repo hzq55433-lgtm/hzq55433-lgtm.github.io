@@ -1,6 +1,8 @@
 "use strict";
 
-(() => {
+(async () => {
+  await window.SiteAccount.ready;
+  const storage = window.SiteAccount.storage;
   const key = "little-corner.home.v1";
   const defaults = {
     name: "一隅",
@@ -12,7 +14,7 @@
   const $ = (id) => document.getElementById(id);
   let storageWarning = false;
   try {
-    const saved = JSON.parse(localStorage.getItem(key) || "null");
+    const saved = JSON.parse(storage.getItem(key) || "null");
     if (saved && typeof saved === "object" && !Array.isArray(saved)) {
       for (const field of Object.keys(defaults)) {
         if (typeof saved[field] === "string") state[field] = saved[field];
@@ -32,13 +34,16 @@
     toastTimer = setTimeout(() => el.classList.remove("is-visible"), 3600);
   }
 
-  function persist() {
+  async function persist(nextState) {
+    const buttons = [...document.querySelectorAll("#note-form button[type='submit'], #settings-form button[type='submit']")];
+    buttons.forEach((button) => { button.disabled = true; });
     try {
-      localStorage.setItem(key, JSON.stringify(state));
+      await storage.setItem(key, JSON.stringify(nextState));
+      state = nextState;
       toast("已保存。让这个小角落慢慢长成你的样子。");
-    } catch {
-      toast("当前浏览器无法保存，刷新后这些修改会消失。");
-    }
+      return true;
+    } catch (error) { toast(error.message || "保存未成功，请保留当前修改并稍后重试。"); return false; }
+    finally { buttons.forEach((button) => { button.disabled = false; }); }
   }
 
   function render() {
@@ -75,11 +80,11 @@
   }
   $("write-note").addEventListener("click", openNote);
   $("edit-note").addEventListener("click", openNote);
-  $("note-form").addEventListener("submit", (event) => {
+  $("note-form").addEventListener("submit", async (event) => {
     event.preventDefault();
-    state.note = $("note-input").value.trim();
-    state.updatedAt = state.note ? new Date().toISOString() : "";
-    persist();
+    const note = $("note-input").value.trim();
+    const nextState = { ...state, note, updatedAt: note ? new Date().toISOString() : "" };
+    if (!(await persist(nextState))) return;
     render();
     $("note-dialog").close();
   });
@@ -89,7 +94,7 @@
     $("settings-dialog").showModal();
     $("name-input").focus();
   });
-  $("settings-form").addEventListener("submit", (event) => {
+  $("settings-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     const name = $("name-input").value.trim();
     const intro = $("intro-input").value.trim();
@@ -98,9 +103,7 @@
       (!name ? $("name-input") : $("intro-input")).focus();
       return;
     }
-    state.name = name;
-    state.intro = intro;
-    persist();
+    if (!(await persist({ ...state, name, intro }))) return;
     render();
     $("settings-dialog").close();
   });
@@ -114,7 +117,7 @@
     });
   });
   const links = [...document.querySelectorAll(".nav-link")];
-  const pages = new Map([["#journal", $("journal")], ["#games", $("games")]]);
+  const pages = new Map([["#journal", $("journal")], ["#games", $("games")], ["#library", $("library")]]);
   const homeLinks = links.filter((link) => !pages.has(link.getAttribute("href")));
   const sections = homeLinks.map((link) => document.querySelector(link.getAttribute("href")));
   function updateNavigation() {

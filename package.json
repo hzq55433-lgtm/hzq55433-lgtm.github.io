@@ -1,0 +1,8 @@
+{
+  "name": "little-corner",
+  "version": "1.0.0",
+  "private": true,
+  "description": "一隅：本地文献库、PDF 阅读、日志与小游戏",
+  "engines": { "node": ">=24" },
+  "scripts": { "start": "node server.mjs", "start:accounts": "node server.mjs --accounts", "test": "node --test" }
+}

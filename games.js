@@ -1,6 +1,8 @@
 "use strict";
 
-(() => {
+(async () => {
+  await window.SiteAccount.ready;
+  const storage = window.SiteAccount.storage;
   const rules = window.LittleCorner2048;
   const key = "little-corner.game2048.v1";
   const $ = (id) => document.getElementById(id);
@@ -9,24 +11,57 @@
     && safeNumber(value.score) && safeNumber(value.moves) && typeof value.won === "boolean";
   let state = { board: rules.newBoard(), score: 0, best: 0, won: false, moves: 0, undo: null };
   let storageMessage = "";
+  let loadedProgress = false;
   try {
-    const raw = localStorage.getItem(key);
+    const raw = storage.getItem(key);
     if (raw !== null) {
       const saved = JSON.parse(raw);
       if (saved?.version === 1 && validSnapshot(saved) && safeNumber(saved.best)
         && (saved.undo === null || validSnapshot(saved.undo))) {
         state = { board: [...saved.board], score: saved.score, best: Math.max(saved.best, saved.score), won: saved.won, moves: saved.moves, undo: saved.undo };
+        loadedProgress = true;
       } else storageMessage = "原有游戏进度格式不完整，已开始新的一局。";
     }
   } catch { storageMessage = "当前浏览器无法读取游戏进度，本局会从头开始。"; }
 
-  function persist() {
-    try {
-      localStorage.setItem(key, JSON.stringify({ version: 1, ...state }));
-    } catch { storageMessage = "当前浏览器无法保存游戏进度，刷新后可能需要重新开始。"; }
+  let pendingSave = null;
+  let saveTask = null;
+  let saveFailed = false;
+  function showStorageStatus() {
     $("game-storage-status").textContent = storageMessage;
     $("game-storage-status").hidden = !storageMessage;
   }
+  function persist() {
+    pendingSave = JSON.stringify({ version: 1, ...state });
+    if (saveTask) return saveTask;
+    if (window.SiteAccount.isCloud) { storageMessage = "正在保存游戏进度…"; showStorageStatus(); }
+    saveTask = (async () => {
+      while (pendingSave) {
+        const serialized = pendingSave;
+        pendingSave = null;
+        try {
+          await storage.setItem(key, serialized);
+          storageMessage = "";
+          saveFailed = false;
+        } catch (error) {
+          storageMessage = error.message || "游戏进度未能保存，请稍后再试。";
+          saveFailed = true;
+          pendingSave = null;
+          break;
+        }
+      }
+      showStorageStatus();
+    })().finally(() => { saveTask = null; });
+    return saveTask;
+  }
+  window.SiteAccount.onBeforeLogout(async () => {
+    if (saveFailed) await persist();
+    if (saveTask) await saveTask;
+    if (saveFailed) throw new Error("游戏进度暂未保存，请检查网络后再退出。");
+  });
+  window.addEventListener("beforeunload", (event) => {
+    if (window.SiteAccount.isCloud && saveTask) { event.preventDefault(); event.returnValue = ""; }
+  });
   function needsWinNotice() { return !state.won && state.board.some((value) => value >= 2048); }
   function isOver() { return !rules.canMove(state.board); }
   function announce(message) { $("game-announcement").textContent = message; }
@@ -136,7 +171,8 @@
   window.addEventListener("site:viewchange", (event) => {
     if (event.detail.view === "games") focusBoard();
   });
-  persist();
+  if (!loadedProgress) persist();
+  else showStorageStatus();
   render();
   if (needsWinNotice()) announce("你的这一局已达到 2048，可以继续挑战。");
   else if (isOver()) announce("这一局没有可移动的方块了，可以撤回或重新开始。");

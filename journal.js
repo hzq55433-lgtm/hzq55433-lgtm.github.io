@@ -1,6 +1,8 @@
 "use strict";
 
-(() => {
+(async () => {
+  await window.SiteAccount.ready;
+  const storage = window.SiteAccount.storage;
   const storageKey = "little-corner.journal.v1";
   const format = "little-corner-journal";
   const $ = (id) => document.getElementById(id);
@@ -13,6 +15,7 @@
   let storageRevision = null;
   let editorBaseline = "";
   let toastTimer;
+  let saving = false;
 
   function localDate(date = new Date()) {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -39,7 +42,7 @@
     return value.map(({ id, date, title, content, createdAt, updatedAt, deletedAt }) => ({ id, date, title, content, createdAt, updatedAt, deletedAt }));
   }
   try {
-    const raw = localStorage.getItem(storageKey);
+    const raw = storage.getItem(storageKey);
     storageRevision = raw;
     if (raw !== null) {
       const saved = JSON.parse(raw);
@@ -58,26 +61,30 @@
     toast.classList.add("is-visible");
     toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 4500);
   }
-  function commit(nextEntries) {
+  async function commit(nextEntries) {
+    if (saving) { notify("正在保存，请稍等一下。"); return false; }
     if (!storageReadable) {
       notify("原有日志暂时无法读取，已停止写入以保留原数据。");
       return false;
     }
+    const buttons = [...document.querySelectorAll("#journal-form button[type='submit'], #journal-delete-confirm, #journal-restore")];
+    saving = true;
+    buttons.forEach((button) => { button.disabled = true; });
     try {
-      if (localStorage.getItem(storageKey) !== storageRevision) {
+      if (storage.getItem(storageKey) !== storageRevision) {
         notify("日志在另一个页面有更新。请先复制当前正文，刷新后再编辑，避免覆盖新内容。");
         return false;
       }
       if (nextEntries.length > 10000) throw new Error("日志数量达到上限");
       const serialized = JSON.stringify({ version: 1, entries: nextEntries });
-      localStorage.setItem(storageKey, serialized);
+      await storage.setItem(storageKey, serialized);
       storageRevision = serialized;
       entries = nextEntries;
       return true;
-    } catch {
-      notify("保存失败，可能是浏览器存储不可用或已满。请保留正文并导出已有日志。");
+    } catch (error) {
+      notify(error.message || "保存失败，请保留正文并导出已有日志。");
       return false;
-    }
+    } finally { saving = false; buttons.forEach((button) => { button.disabled = false; }); }
   }
   function makeId() {
     return typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `entry-${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -195,7 +202,7 @@
   window.addEventListener("beforeunload", (event) => {
     if ($("journal-dialog").open && dirty()) { event.preventDefault(); event.returnValue = ""; }
   });
-  $("journal-form").addEventListener("submit", (event) => {
+  $("journal-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     const date = $("journal-date-input").value;
     const title = $("journal-title-input").value.trim();
@@ -210,8 +217,8 @@
     const now = new Date().toISOString();
     const entry = { id: previous?.id ?? makeId(), date, title, content, createdAt: previous?.createdAt ?? now, updatedAt: now, deletedAt: null };
     const next = previous ? entries.map((item) => item.id === entry.id ? entry : item) : [...entries, entry];
-    if (!commit(next)) {
-      $("journal-form-error").textContent = "保存未成功，正文仍在这里。请先复制留存，检查浏览器存储后再保存。";
+    if (!(await commit(next))) {
+      $("journal-form-error").textContent = "保存未成功，正文仍在这里。请先复制留存，检查网络或账号状态后再保存。";
       $("journal-form-error").hidden = false;
       return;
     }
@@ -230,16 +237,16 @@
     $("journal-delete-description").textContent = `「${titleOf(entry)}」会从日志列表中收起。`;
     $("journal-delete-dialog").showModal();
   });
-  $("journal-delete-confirm").addEventListener("click", () => {
+  $("journal-delete-confirm").addEventListener("click", async () => {
     if (!entries.some((entry) => entry.id === pendingDeleteId)) return;
-    if (!commit(entries.map((entry) => entry.id === pendingDeleteId ? { ...entry, deletedAt: new Date().toISOString() } : entry))) return;
+    if (!(await commit(entries.map((entry) => entry.id === pendingDeleteId ? { ...entry, deletedAt: new Date().toISOString() } : entry)))) return;
     $("journal-delete-dialog").close();
     pendingDeleteId = null;
     render();
     notify("已移到回收站，可以随时恢复。");
   });
-  $("journal-restore").addEventListener("click", () => {
-    if (!commit(entries.map((entry) => entry.id === selectedId ? { ...entry, deletedAt: null } : entry))) return;
+  $("journal-restore").addEventListener("click", async () => {
+    if (!(await commit(entries.map((entry) => entry.id === selectedId ? { ...entry, deletedAt: null } : entry)))) return;
     showTrash = false;
     render();
     notify("日志已恢复。");
@@ -279,7 +286,7 @@
   $("journal-export").addEventListener("click", () => {
     if (!storageReadable) {
       try {
-        download(localStorage.getItem(storageKey) ?? "null", `日志原始数据-${localDate()}.json`);
+        download(storage.getItem(storageKey) ?? "null", `日志原始数据-${localDate()}.json`);
         notify("已导出原始数据，请保留这份文件用于恢复。");
       } catch { notify("无法读取日志数据，请检查浏览器存储权限。"); }
       return;
@@ -313,7 +320,7 @@
         added++;
       }
       if (next.length > 10000) throw new Error("日志数量过多，本次导入未写入。");
-      if (added && !commit(next)) return;
+      if (added && !(await commit(next))) return;
       showTrash = false;
       $("journal-search").value = "";
       $("journal-month").value = "";
